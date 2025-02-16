@@ -10,7 +10,7 @@ const server = http.createServer(app);
 connectDB();
 
 app.get('/', (req, res) => {
-    res.send('Hello World! hahahah');
+    res.send('Hello World! toi la nga');
 });
 
 app.get('/login', (req, res) => {

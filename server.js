@@ -1,28 +1,25 @@
 const express = require('express');
 const app = express();
-const cors = require('cors');
 require('dotenv').config();
 const http = require('http');
 const mongoose = require('mongoose');
 const connectDB = require('./config/connectDB');
+const socket = require('./socket/socket');
+const cookieParser = require('cookie-parser');
 const port = 3500;
 
 const server = http.createServer(app);
 connectDB();
+socket(server);
 
-//MIDDLEWARE
-app.use(cors());
-app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
-    res.send('Hello World! :>>>');
+    res.send('Hello World!');
 });
 
-//ROUTER
-app.use('/messages', require('./routes/api/messageRouter'));
-
-//CONNECT TO DATABASE
 mongoose.connection.once('open', () => {
     console.log("Database connected...");
     

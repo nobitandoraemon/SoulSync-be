@@ -20,6 +20,8 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+app.use('/messages', require('./routes/api/messageRouter'));
+
 mongoose.connection.once('open', () => {
     console.log("Database connected...");
     

@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/messages', require('./routes/api/messageRouter'));
+app.use('/users', require('./routes/api/userRouter'));
 
 mongoose.connection.once('open', () => {
     console.log("Database connected...");

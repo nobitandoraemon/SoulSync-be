@@ -1,5 +1,8 @@
 const Message = require('../models/Message');
 const { Server } = require('socket.io');
+const freeUser = require('../data/freeUser');
+
+const couple = new Map([]);
 
 const socket = (server) => {
     console.log('socket');
@@ -22,6 +25,30 @@ const socket = (server) => {
 
     io.on('connection', (socket) => {
         socket.join(socket.username);
+
+        socket.on('ok', (data) => {
+            const {username} = data; //B's username
+            const match = couple.get(username);
+            if(!match) {
+                couple.set(socket.username, "_");
+            }
+            couple.set(username, socket.username);
+            io.to([socket.username, username]).emit('match', {
+                A: socket.username,
+                B: username
+            });
+        });
+
+        socket.on('leave', (data) => {
+            couple.forEach((key, value) => {
+                if(key === socket.username || value === socket.username) {
+                    couple.delete(key);
+
+                    freeUser.add(key);
+                    freeUser.add(value);
+                }
+            });
+        })
 
         socket.on('chat', async (data) => {
             const {receiver, content } = data;

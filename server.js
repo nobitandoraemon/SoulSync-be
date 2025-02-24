@@ -6,11 +6,17 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/connectDB');
 const socket = require('./socket/socket');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const credentials = require('./middlewares/credentials');
+const corOptions = require('./config/corOptions');
 const port = 3500;
 
 const server = http.createServer(app);
 connectDB();
 socket(server);
+
+app.use(credentials);
+app.use(cors(corOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));

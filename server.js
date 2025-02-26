@@ -26,11 +26,11 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+app.use('/register', require('./routes/registerRouter'));
+app.use('/auth', require('./routes/authRouter'));
+
 app.use('/messages', require('./routes/api/messageRouter'));
 app.use('/users', require('./routes/api/userRouter'));
-app.use('/register', require('./routes/registerRouter'));
-
-app.use('/auth', require('./routes/authRouter'));
 
 mongoose.connection.once('open', () => {
     console.log("Database connected...");

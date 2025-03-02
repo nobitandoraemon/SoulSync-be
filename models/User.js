@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
   hobbies: { type: [String] },
   location: { type: String },
   hasChatted: { type: [String] },
-  refreshToken: { type: String }
+  refreshToken: { type: String },
+  avatar: { type: String }
 });
 
 module.exports = mongoose.model("User", userSchema);

@@ -3,11 +3,9 @@ const router = express.Router();
 const userController = require("../../controllers/userController");
 const verifyAccessToken = require('../../middlewares/authMiddleware');
 
-router.use(verifyAccessToken);
-
-
 router.get("/", userController.getAllUsers);
 router.get("/:username", userController.getUserByUsername);
+router.use(verifyAccessToken);
 router.put("/:username", userController.updateUser);
 router.delete("/:username", userController.deleteUser);
 

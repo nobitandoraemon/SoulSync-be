@@ -23,18 +23,19 @@ const getUserByUsername = async (req, res) => {
     }
 };
 
-// Cập nhật thông tin người dùng (dùng form)
+// Cập nhật thông tin người dùng
+
 const updateUser = async (req, res) => {
     try {
         const { username } = req.params;
-        const { birthday, gender, zodiac, hobbies, location, hasChatted } = req.body;
-        const updateData = { birthday, gender, zodiac, hobbies, location, hasChatted };
+        const { birthday, gender, zodiac, hobbies, location, hasChatted, avatar } = req.body;
+        const updateData = { birthday, gender, zodiac, hobbies, location, hasChatted, avatar };
 
         const updatedUser = await User.findOneAndUpdate(
             { username },
             updateData,
-            { new: true, select: '-password -refreshToken' }
-        );
+            { new: true }
+        ).select('-password'); // Loại bỏ password khỏi kết quả
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'Không tìm thấy người dùng' });
@@ -44,6 +45,7 @@ const updateUser = async (req, res) => {
         res.status(500).json({ message: 'Lỗi server' });
     }
 };
+
 
 // Xóa người dùng
 const deleteUser = async (req, res) => {

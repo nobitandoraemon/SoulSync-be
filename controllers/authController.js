@@ -31,19 +31,12 @@ const loginUser = async (req, res) => {
             { expiresIn: '1d' }
         );
 
-        user.refreshToken = refreshToken;
-
-        try {
-            await user.save();
-        } catch (err) {
-            return res.status(500).json({ message: 'Không thể lưu refresh token.' });
-        }
 
         res.cookie('jwt', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'None',
-            maxAge: 24 * 60 * 60 * 1000 // 1 ngày
+            maxAge: 24 * 60 * 60 * 1000 
         });
 
         res.json({ accessToken });
@@ -58,28 +51,13 @@ const logoutUser = async (req, res) => {
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.sendStatus(204);
 
-    const refreshToken = cookies.jwt;
-
-    try {
-        const user = await User.findOne({ refreshToken });
-        if (!user) {
-            res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: process.env.NODE_ENV === 'production' });
-            return res.sendStatus(204);
-        }
-
-        user.refreshToken = '';
-        try {
-            await user.save();
-        } catch (err) {
-            return res.status(500).json({ message: 'Không thể xóa refresh token.' });
-        }
-
-        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: process.env.NODE_ENV === 'production' });
-        res.json({ message: 'Đăng xuất thành công' });
-
-    } catch (error) {
-        res.status(500).json({ message: 'Lỗi server.' });
-    }
+    res.clearCookie('jwt', { 
+        httpOnly: true, 
+        sameSite: 'None', 
+        secure: process.env.NODE_ENV === 'production' 
+    });
+    
+    return res.json({ message: 'Đăng xuất thành công' });
 };
 
 module.exports = { loginUser, logoutUser };

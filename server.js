@@ -15,6 +15,7 @@ const server = http.createServer(app);
 connectDB();
 socket(server);
 
+//Middlewares
 app.use(credentials);
 app.use(cors(corOptions));
 
@@ -26,12 +27,15 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+//Router
 app.use('/register', require('./routes/registerRouter'));
 app.use('/auth', require('./routes/authRouter'));
 app.use('/messages', require('./routes/api/messageRouter'));
 app.use('/users', require('./routes/api/userRouter'));
 app.use('/refresh', require('./routes/refreshRouter'));
 
+
+app.use('/match', require('./routes/api/zodiacRouter'));
 
 mongoose.connection.once('open', () => {
     console.log("Database connected...");

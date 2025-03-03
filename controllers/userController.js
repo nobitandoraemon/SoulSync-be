@@ -3,7 +3,7 @@ const User = require('../models/User');
 // Lấy tất cả người dùng
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password -refreshToken');
+        const users = await User.find().select('-password');
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: 'Lỗi server' });
@@ -13,7 +13,7 @@ const getAllUsers = async (req, res) => {
 // Lấy thông tin một người dùng theo username
 const getUserByUsername = async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.username }).select('-password -refreshToken');
+        const user = await User.findOne({ username: req.params.username }).select('-password');
         if (!user) {
             return res.status(404).json({ message: 'Không tìm thấy người dùng' });
         }
@@ -28,8 +28,8 @@ const getUserByUsername = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { username } = req.params;
-        const { birthday, gender, zodiac, hobbies, location, hasChatted, avatar } = req.body;
-        const updateData = { birthday, gender, zodiac, hobbies, location, hasChatted, avatar };
+        const { birthday, gender, zodiac, hobbies, location, image  } = req.body;
+        const updateData = { birthday, gender, zodiac, hobbies, location, image };
 
         const updatedUser = await User.findOneAndUpdate(
             { username },

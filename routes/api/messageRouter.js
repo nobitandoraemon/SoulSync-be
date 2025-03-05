@@ -5,7 +5,7 @@ const messageController = require('../../controllers/messageControler');
 //GET ALL MESSAGES IN A ROOM
 router.get('/', messageController.getMessages);
 
-//DELETE A MESSAGE
+//DELETE, UPDATE A MESSAGE
 router.route('/:id').delete(messageController.deleteMessage)
                     .put(messageController.updateMessage);
 

@@ -27,6 +27,4 @@ const zodiacMatch = new Map([
     [24, [23, 17, 18]]    // Song Ngư Nữ hợp với Song Ngư Nam, Nhân Mã Nam, Nhân Mã Nữ...
 ]);
 
-// zodiacMatch.get(1); //dung cai nay se lay duoc phan tu tuong ung voi 1
-
 module.exports = zodiacMatch;

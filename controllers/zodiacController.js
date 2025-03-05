@@ -21,7 +21,7 @@ const zodiacController = {
             let matchedUser = null;
             for (let freeUsername of freeUser) {
                 const freeUserData = await User.findOne({ username: freeUsername });
-                if (freeUserData && matchZodiacId.includes(freeUserData.zodiac)) {
+                if (freeUserData && matchZodiacIds.includes(freeUserData.zodiac)) {
                     matchedUser = freeUsername;
                     freeUser.delete(matchedUser);
                     break;

@@ -1,13 +1,22 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
-// Đăng ký
+const isStrongPassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+};
+
 const registerUser = async (req, res) => {
     const { username, password } = req.body;
 
     // Kiểm tra dữ liệu đầu vào
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Username và mật khẩu là bắt buộc.' });
+    if (!username || username.length < 8) {
+        return res.status(400).json({ message: 'Username phải có ít nhất 8 ký tự.' });
+    }
+    if (!isStrongPassword(password)) {
+        return res.status(400).json({ 
+            message: 'Password phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.' 
+        });
     }
 
     try {
@@ -20,11 +29,8 @@ const registerUser = async (req, res) => {
         // Mã hóa mật khẩu
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Tạo user mới chỉ với username và password đã mã hóa
-        const newUser = new User({
-            username,
-            password: hashedPassword
-        });
+        // Tạo user mới
+        const newUser = new User({ username, password: hashedPassword });
 
         await newUser.save();
         res.status(201).json({ message: 'Đăng ký thành công' });

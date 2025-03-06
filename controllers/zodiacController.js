@@ -35,7 +35,6 @@ const zodiacController = {
             //Delete user1 and user2 from freeUser
             freeUser.delete(username);
 
-            console.log(freeUser);
             return res.status(200).json({
                 message: "Match found!",
                 matchedUser

@@ -80,9 +80,19 @@ const socket = (server) => {
             });
         });
 
+        socket.on('delete', async (data) => {
+            const { id } = data;
+            const message = await Message.findByIdAndDelete({ "_id": id }); 
+            
+            io.to([receiver, socket.username]).emit('delete', { //emit delete back to A and B
+                id, deleteTime: new Date()
+            });
+        });
+
         socket.on('disconnect', () => {
             console.log(`${socket.username} diconnected!`);
         });
+
     });
 }
 

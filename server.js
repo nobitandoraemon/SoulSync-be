@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const credentials = require('./middlewares/credentials');
 const corOptions = require('./config/corOptions');
+const otpRoute = require('./routes/otpRoute');
 const port = 3500;
 
 const server = http.createServer(app);
@@ -25,7 +26,7 @@ app.use(cookieParser());
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
-
+app.use('/otp',otpRoute);
 app.use('/register', require('./routes/registerRouter'));
 app.use('/auth', require('./routes/authRouter'));
 app.use('/refresh', require('./routes/refreshRouter'));

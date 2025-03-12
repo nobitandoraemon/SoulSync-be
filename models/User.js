@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema({
   zodiac: { type: Number },
   hobbies: { type: [String] },
   location: { type: String },
+  fullName: {type: String},
+  phoneNumber: {type: String},
+  quote: {type: String},
   image: { type: String }
 });
 

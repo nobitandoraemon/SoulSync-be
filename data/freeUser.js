@@ -1,3 +1,3 @@
-const freeUser = new Set(["Thai2", "lilyhouse"]);
+const freeUser = new Set([]);
 
 module.exports = freeUser;

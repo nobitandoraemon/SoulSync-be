@@ -12,7 +12,7 @@ const findMatch = async (username) => {
         let bestScore = -Infinity;
         let elapsedTime = 0;
         const interval = 10000;
-        const timeout = 20000;
+        const timeout = 10 * 60000;
 
         const searchMatch = async (resolve) => {
             for (const otherUsername of freeUser) {
@@ -23,8 +23,6 @@ const findMatch = async (username) => {
 
                 //Tính điểm
                 const zodiacScore = calculateZodiacScore(user.zodiac, otherUser.zodiac);
-                console.log(zodiacScore);
-                //Sửa parameter
                 const numerologyScore = calculateNumerologyScore(user.birthday, otherUser.birthday);
 
                 const score = zodiacScore * 2 + numerologyScore;

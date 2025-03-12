@@ -1,6 +1,6 @@
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://soulsync-fe.netlify.app'
+    'https://soul-sync.1020phug.workers.dev'
 ];
 
 module.exports = allowedOrigins;

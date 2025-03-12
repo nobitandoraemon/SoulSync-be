@@ -9,7 +9,7 @@ const socket = (server) => {
 
     const io = new Server(server, {
         cors: {
-            origin: ['http://localhost:5173', 'https://soul-sync.1020phug.workers.dev'],
+            origin: ['http://localhost:5173', 'https://soulsync-fe.pages.dev'],
             credentials: true
         }
     });

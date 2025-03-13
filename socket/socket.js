@@ -84,14 +84,29 @@ const socket = (server) => {
 
         socket.on('delete', async (data) => {
             const { id } = data;
-            const message = await Message.findByIdAndDelete({ "_id": id }); 
-            
+            const message = await Message.findByIdAndDelete({ "_id": id });
+
             io.to([receiver, socket.username]).emit('delete', { //emit delete back to A and B
                 id, deleteTime: new Date()
             });
         });
 
         socket.on('disconnect', () => {
+            if (freeUser.has(socket.username)) {
+                freeUser.delete(socket.username);
+            }
+
+            couple.forEach((key, value) => {
+                if (key === socket.username) {
+                    couple.delete(key);
+                    freeUser.add(value);
+                }
+                if(value === socket.username) {
+                    freeUser.add(key);
+                    couple.delete(key);
+                }
+            });
+
             console.log(`${socket.username} diconnected!`);
         });
 

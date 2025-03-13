@@ -3,9 +3,9 @@ const jwt = require ('jsonwebtoken');
 const verifyAccessToken = (req,res,next) => {
     const cookies = req.cookies;
     
-    // if(!cookies?.jwt) {
-    //     return res.sendStatus(401);
-    // }
+    if(!cookies?.jwt) {
+        return res.sendStatus(401);
+    }
 
     const authHeader = req.headers ['authorization'];
     if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401); // Không có accessToken

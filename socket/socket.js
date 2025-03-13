@@ -25,6 +25,8 @@ const socket = (server) => {
 
     io.on('connection', (socket) => {
         socket.join(socket.username);
+        freeUser.add(socket.username);
+        console.log(freeUser);
 
         socket.on('ok', (data) => {
             const { username } = data; //B's username

@@ -26,24 +26,25 @@ const registerUser = async (req, res) => {
     }
 
     try {
+        
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             return res.status(409).json({ message: 'Email đã tồn tại.' });
         }
 
-        const storedOtp = await Otp.findOne({ username, otp });
-        if (!storedOtp || storedOtp.expiresAt < new Date()) {
-            return res.status(400).json({ message: 'Mã OTP không chính xác hoặc đã hết hạn.' });
+        const verifiedUser = await User.findOne({ username, isVerified: true });
+        if (!verifiedUser) {
+            return res.status(400).json({
+                message: 'Email chưa được xác thực. Vui lòng xác thực OTP trước khi đăng ký.'
+            });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ username, password: hashedPassword });
 
         await newUser.save();
-        await Otp.deleteOne({ username, otp });
 
         res.status(201).json({ message: 'Đăng ký thành công.' });
-
     } catch (error) {
         res.status(500).json({ message: 'Lỗi server.' });
     }

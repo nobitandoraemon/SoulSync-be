@@ -11,8 +11,8 @@ const findMatch = async (username) => {
         let bestMatch = null;
         let bestScore = -Infinity;
         let elapsedTime = 0;
-        const interval = 10000;
-        const timeout = 10 * 60000;
+        const interval = 5000;
+        const timeout = 30000;
 
         const searchMatch = async (resolve) => {
             for (const otherUsername of freeUser) {
@@ -61,7 +61,7 @@ const matchController = {
 
             if (!username) return res.status(400).json({ error: "Username is required" });
 
-            const matchedUsername = findMatch(username);
+            const matchedUsername = await findMatch(username);
             const matchedUser = await User.findOne({ matchedUsername });
 
             if (!matchedUser) {

@@ -2,12 +2,6 @@ const Otp = require('../models/Otp');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
-//Kiểm tra email hợp lệlệ
-const isValidEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-};
-
 // Tạo transporter để gửi email
 const transporter = nodemailer.createTransport({
     service: 'gmail',

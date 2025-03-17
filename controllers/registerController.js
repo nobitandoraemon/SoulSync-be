@@ -32,19 +32,14 @@ const registerUser = async (req, res) => {
             return res.status(409).json({ message: 'Email đã tồn tại.' });
         }
 
-        const verifiedUser = await User.findOne({ username, isVerified: true });
-        if (!verifiedUser) {
-            return res.status(400).json({
-                message: 'Email chưa được xác thực. Vui lòng xác thực OTP trước khi đăng ký.'
-            });
-        }
-
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ username, password: hashedPassword });
 
-        await newUser.save();
+        req.isVerified = false; 
+        req.newUser = newUser; 
 
-        res.status(201).json({ message: 'Đăng ký thành công.' });
+        res.status(200).json({ message: 'Vui lòng kiểm tra email để nhận mã OTP.' });
+        
     } catch (error) {
         res.status(500).json({ message: 'Lỗi server.' });
     }

@@ -34,26 +34,17 @@ const sendOtpByEmail = async (email, otp) => {
     }
 };
 
-// Yêu cầu OTP
 const requestOtp = async (req, res) => {
     const { username } = req.body;
 
-    if (!username || !isValidEmail(username)) {
-        return res.status(400).json({ message: 'Email không hợp lệ.' });
-    }
-
     try {
+        await Otp.deleteMany({ username });
 
-         // Xóa tất cả OTP cũ của email đó (tránh trùng lặp OTP)
-         await Otp.deleteMany({ email: username });
-
-        // Tạo mã OTP và lưu vào MongoDB
         const generatedOtp = generateOtp();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // Hết hạn sau 10 phút
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-        await Otp.create({ username, otp: generatedOtp, expiresAt });
+        await Otp.create({ username, otp: generatedOtp, expiresAt, newUser: req.newUser });
 
-        // Gửi OTP qua email
         await sendOtpByEmail(username, generatedOtp);
 
         res.status(200).json({ message: 'Mã OTP đã được gửi đến email của bạn.' });
@@ -63,36 +54,26 @@ const requestOtp = async (req, res) => {
     }
 };
 
-// Xác thực OTP
 const verifyOtp = async (req, res) => {
     const { username, otp } = req.body;
-    if (!username || !otp) {
-        return res.status(400).json({ message: 'Vui lòng nhập đầy đủ email và mã OTP.' });
-    }
 
     try {
         const storedOtp = await Otp.findOne({ username, otp });
 
-        if (!storedOtp) {
-            return res.status(400).json({ message: 'Mã OTP không chính xác.' });
+        if (!storedOtp || storedOtp.expiresAt < new Date()) {
+            return res.status(400).json({ message: 'Mã OTP không chính xác hoặc đã hết hạn.' });
         }
 
-        if (storedOtp.expiresAt < new Date()) {
-            await Otp.deleteOne({ username, otp }); // Xóa OTP đã hết hạn
-            return res.status(400).json({ message: 'Mã OTP đã hết hạn.' });
-        }
-        
-        
-        // Đánh dấu email là đã xác thực
-        await User.updateOne({ username }, { $set: { isVerified: true } });
+        const newUser = storedOtp.newUser;
+        await newUser.save();
+        await Otp.deleteOne({ username, otp });
 
-        await Otp.deleteOne({ username, otp }); // Xóa OTP sau khi xác thực thành công
-        res.status(200).json({ message: 'Xác thực OTP thành công.' });
+        res.status(201).json({ message: 'Đăng ký thành công.' });
 
     } catch (error) {
-        
         res.status(500).json({ message: 'Lỗi server khi xác thực OTP.' });
     }
 };
+
 
 module.exports = { requestOtp, verifyOtp };

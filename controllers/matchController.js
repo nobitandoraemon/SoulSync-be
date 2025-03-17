@@ -61,7 +61,8 @@ const matchController = {
 
             if (!username) return res.status(400).json({ error: "Username is required" });
 
-            const matchedUser = await findMatch(username);
+            const matchedUsername = findMatch(username);
+            const matchedUser = await User.findOne({ matchedUsername });
 
             if (!matchedUser) {
                 return res.status(403).json("No match found");

@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
-const Otp = require('../models/Otp');
+const { sendOtpByEmail } = require('./otpController');
+const { userTempStorage } = require('../utils/tempStorage');
 
 const isValidEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -13,7 +14,7 @@ const isStrongPassword = (password) => {
 };
 
 const registerUser = async (req, res) => {
-    const { username, password, otp } = req.body;
+    const { username, password } = req.body;
 
     if (!username || !isValidEmail(username)) {
         return res.status(400).json({ message: 'Email không hợp lệ.' });
@@ -26,21 +27,21 @@ const registerUser = async (req, res) => {
     }
 
     try {
-        
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             return res.status(409).json({ message: 'Email đã tồn tại.' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, password: hashedPassword });
-
-        req.newUser = newUser; 
-        res.status(200).json({ message: 'Vui lòng kiểm tra email để nhận mã OTP.' });
         
+        userTempStorage.set(username, { username, password: hashedPassword });
+        await sendOtpByEmail(username);
+
+        res.status(200).json({ message: 'Vui lòng kiểm tra email để nhận mã OTP.' });
+
     } catch (error) {
         res.status(500).json({ message: 'Lỗi server.' });
     }
 };
 
-module.exports = { registerUser };
+module.exports = { registerUser};

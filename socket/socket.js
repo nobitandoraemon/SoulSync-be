@@ -3,7 +3,7 @@ const { Server } = require('socket.io');
 const freeUser = require('../data/freeUser');
 const findMatch = require('../controllers/matchController')
 
-const couple = new Map([]);
+const couple = [];
 
 const socket = (server) => {
     console.log('socket');
@@ -17,6 +17,8 @@ const socket = (server) => {
 
     io.use((socket, next) => {
         const username = socket.handshake.auth.username;
+        console.log(username);
+        
         if (!username) {
             return next(new Error('Invalid username'));
         }
@@ -28,6 +30,11 @@ const socket = (server) => {
         socket.join(socket.username);
         freeUser.add(socket.username);
         console.log(freeUser);
+
+        socket.on('find', (data) => {
+            const {username} = data;
+            freeUser.add(username);
+        })
 
         socket.on('ok', (data) => {
             const { username } = data; //B's username

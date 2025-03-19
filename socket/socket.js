@@ -1,7 +1,8 @@
 const Message = require('../models/Message');
 const { Server } = require('socket.io');
 const freeUser = require('../data/freeUser');
-const findMatch = require('../controllers/matchController')
+const findMatch = require('../controllers/matchController');
+const User = require('../models/User');
 
 const couple = [];
 
@@ -15,49 +16,109 @@ const socket = (server) => {
         }
     });
 
-    io.use((socket, next) => {
+    io.use(async (socket, next) => {
         const username = socket.handshake.auth.username;
-        console.log(username);
-        
         if (!username) {
             return next(new Error('Invalid username'));
         }
         socket.username = username;
+
+        const user = await User.findOne({ username }).select('-password');
+
+        socket.user = user;
+        // console.log(socket.user);
+        // console.log(socket.username);        
+
         next();
     });
 
     io.on('connection', (socket) => {
+        console.log("connect ", socket.username);
+
         socket.join(socket.username);
         freeUser.add(socket.username);
         console.log(freeUser);
+        let matchedUser = null;
 
-        socket.on('find', (data) => {
-            const {username} = data;
-            freeUser.add(username);
-        })
 
-        socket.on('ok', (data) => {
-            const { username } = data; //B's username
-            const match = couple.get(username);
-            if (!match) {
-                couple.set(socket.username, "_"); //If B hasn't hit ok, Set A with a empty "_"
-            } else { // If B has hit "ok", then set B with A and emit match
-                couple.set(username, socket.username);
-                io.to([socket.username, username]).emit('match', {
-                    A: socket.username,
-                    B: username
+        socket.on('find', async (data) => {
+            freeUser.add(socket.username);
+            matchedUser = await findMatch(socket.username);
+            console.log(matchedUser);
+            
+            if (matchedUser) {
+                freeUser.delete(socket.username);
+                freeUser.delete(matchedUser.username);
+
+                console.log(freeUser);
+
+                couple.push({
+                    A: {
+                        username: socket.username,
+                        status: false
+                    },
+                    B: {
+                        username: matchedUser.username,
+                        status: false
+                    }
+                });
+
+                io.to([socket.username, matchedUser.username]).emit('wait', {
+                    A: socket.user,
+                    B: matchedUser
+                });
+            } else {
+                console.log('fail');
+                io.to(socket.username).emit('fail', {                    
+                    message: "We haven't found out anyone matching with you!"
                 });
             }
         });
 
-        socket.on('leave', (data) => {
-            couple.forEach((key, value) => {
-                if (key === socket.username || value === socket.username) {
-                    couple.delete(key);
-
-                    freeUser.add(key);
-                    freeUser.add(value);
+        socket.on('ok', (data) => {
+            couple.forEach((cp) => {
+                if (cp.A.status && cp.B.status) {
+                    io.to([socket.username, matchedUser.username]).emit('match', {
+                        message: "Sucessfull"
+                    });
+                } else {
+                    if (cp.A === socket.user) {
+                        cp.A.status = true;
+                    } else if (cp.B === socket.user) {
+                        cp.B.status = true;
+                    }
                 }
+
+            });
+        });
+
+        socket.on('refuse', (data) => {
+            let count = 0;
+            couple.forEach((cp) => {
+                if (cp.A === socket.user || cp.B === socket.user) {
+                    couple.splice(count, 1);
+
+                    freeUser.add(cp.A.username);
+                    freeUser.add(cp.B.username);
+                }
+                count++;
+            });
+            io.to([socket.username, matchedUser.username]).emit('fail', {
+                message: "Fail to match!"
+            });
+
+        })
+
+        socket.on('leave', (data) => {
+            let count = 0;
+            couple.forEach((cp) => {
+                if (cp.A === socket.user || cp.B === socket.user) {
+                    couple.splice(count, 1);
+
+                    freeUser.add(cp.A.username);
+                    freeUser.add(cp.B.username);
+                }
+                count++;
             });
         })
 
@@ -104,17 +165,17 @@ const socket = (server) => {
                 freeUser.delete(socket.username);
             }
 
-            couple.forEach((key, value) => {
-                if (key === socket.username) {
-                    couple.delete(key);
-                    freeUser.add(value);
+            let count = 0;
+            couple.forEach((cp) => {
+                if (cp.A === socket.user) { 
+                    freeUser.add(cp.B.username);
+                    couple.splice(count, 1);
+                } else if (cp.B === socket.user) {
+                    freeUser.add(cp.A.username);
+                    couple.splice(count, 1);
                 }
-                if(value === socket.username) {
-                    freeUser.add(key);
-                    couple.delete(key);
-                }
+                count++;
             });
-
             console.log(`${socket.username} diconnected!`);
         });
 

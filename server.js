@@ -36,7 +36,7 @@ app.use(require('./middlewares/authMiddleware'));
 app.use('/messages', require('./routes/api/messageRouter'));
 app.use('/users', require('./routes/api/userRouter'));
 
-app.use('/match', require('./routes/api/matchRouter'));
+// app.use('/match', require('./routes/api/matchRouter'));
 
 mongoose.connection.once('open', () => {
     console.log("Database connected...");

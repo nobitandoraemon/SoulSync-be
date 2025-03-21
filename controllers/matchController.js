@@ -43,10 +43,10 @@ const findMatch = async (username) => {
     const match = async () => {
         while (elapsedTime < timeout) {
             matchUser = await searchMatch(username);
-            if (matchUser) {
-                console.log('g');
-                return matchUser;
-            }
+            // if (matchUser) {
+            //     console.log('g');
+            //     return matchUser;
+            // }
             elapsedTime += interval;
             await wait(3000);
         };

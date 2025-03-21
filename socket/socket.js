@@ -45,7 +45,7 @@ const socket = (server) => {
             freeUser.add(socket.username);
             matchedUser = await findMatch(socket.username);
             console.log(matchedUser);
-            
+
             if (matchedUser) {
                 freeUser.delete(socket.username);
                 freeUser.delete(matchedUser.username);
@@ -69,7 +69,7 @@ const socket = (server) => {
                 });
             } else {
                 console.log('fail');
-                io.to(socket.username).emit('fail', {                    
+                io.to(socket.username).emit('fail', {
                     message: "We haven't found out anyone matching with you!"
                 });
             }
@@ -147,7 +147,9 @@ const socket = (server) => {
             await message.save();
 
             io.to([receiver, socket.username]).emit('new', {
-                id, updateTime: message.updateTime
+                id, 
+                content, 
+                updateTime: message.updateTime
             });
         });
 
@@ -167,7 +169,7 @@ const socket = (server) => {
 
             let count = 0;
             couple.forEach((cp) => {
-                if (cp.A === socket.user) { 
+                if (cp.A === socket.user) {
                     freeUser.add(cp.B.username);
                     couple.splice(count, 1);
                 } else if (cp.B === socket.user) {

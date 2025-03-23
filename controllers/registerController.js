@@ -36,7 +36,6 @@ const registerUser = async (req, res) => {
         
         userTempStorage.set(username, { username, password: hashedPassword });
         await sendOtpByEmail(username);
-
         res.status(200).json({ message: 'Vui lòng kiểm tra email để nhận mã OTP.' });
 
     } catch (error) {

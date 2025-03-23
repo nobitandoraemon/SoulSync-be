@@ -56,14 +56,10 @@ const verifyOtp = async (req, res) => {
     if (!tempUser) {
         return res.status(400).json({ message: 'Thông tin người dùng không tồn tại hoặc đã hết hạn.' });
     }
-
     const newUser = new User(tempUser);
-    console.log('newUser:', newUser);
     await newUser.save();
-
     opts.delete(username);
     userTempStorage.delete(username);
-
     res.status(200).json({ message: 'Đăng ký thành công.' });
 };
 

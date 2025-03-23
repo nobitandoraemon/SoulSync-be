@@ -44,10 +44,16 @@ const messageController = {
         try {
             const { id: messageId } = req.params;
 
-            const message = await Message.findByIdAndUpdate(messageId, { ...req.body, updateTime: Date.now() });
+            const message = await Message.findByIdAndUpdate(
+                messageId, 
+                { ...req.body, updateTime: Date.now() },
+                { new: true }
+            );
+            
             if (!message) {
                 return res.status(404).json({message: "Message not found", id: messageId});
             }
+
             const updated_message = await Message.findById(messageId);
             res.status(200).json(updated_message);
         } catch (error) {

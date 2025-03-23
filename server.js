@@ -16,6 +16,7 @@ const server = http.createServer(app);
 connectDB();
 socket(server);
 
+//Middlewares
 app.use(credentials);
 app.use(cors(corOptions));
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+
 app.use('/otp',otpRoute);
 app.use('/register', require('./routes/registerRouter'));
 app.use('/auth', require('./routes/authRouter'));

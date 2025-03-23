@@ -8,7 +8,7 @@ const messageController = {
             const { sender, receiver } = req.query;
 
             if (!sender || !receiver) {
-                return res.status(400).json({ error: "Required sender and receiver" });
+                return res.status(400).json({ error: "Người nhận và người gửi là bắt buộcbuộc" });
             }
 
             const messages = await Message.find({
@@ -31,9 +31,9 @@ const messageController = {
 
             const message = await Message.findByIdAndDelete(messageId);
             if (!message) {
-                return res.status(404).json('Message not found');
+                return res.status(404).json('Không tìm thấy tin nhắnnhắn');
             }
-            res.status(200).json('Message deleted successfully');
+            res.status(200).json('Xóa tin nhắn thành công');
         } catch (error) {
             res.status(500).json({message: error.message});
         }
@@ -51,7 +51,7 @@ const messageController = {
             );
             
             if (!message) {
-                return res.status(404).json({message: "Message not found", id: messageId});
+                return res.status(404).json({message: "Không tìm thấy tin nhắn", id: messageId});
             }
 
             const updated_message = await Message.findById(messageId);

@@ -38,14 +38,32 @@ const socket = (server) => {
         socket.join(socket.username);
         freeUser.add(socket.username);
         console.log(freeUser);
-        let matchedUser = null;
 
 
         socket.on('find', async (data) => {
+            let matchedUser = null;
+            couple.forEach(async (couple) => {
+                if (couple.A.user.username === socket.username) {
+                    io.to([socket.username]).emit('wait', {
+                        A: socket.user,
+                        B: couple.B.user
+                    });
+                    return;
+                } else if (couple.B.user.username === socket.username) {
+                    io.to([socket.username]).emit('wait', {
+                        A: socket.user,
+                        B: couple.A.user
+                    });
+                    return;
+                }
+
+            });
+
             freeUser.add(socket.username);
+
             matchedUser = await findMatch(socket.username);
             console.log(matchedUser);
-            
+
             if (matchedUser) {
                 freeUser.delete(socket.username);
                 freeUser.delete(matchedUser.username);
@@ -54,22 +72,22 @@ const socket = (server) => {
 
                 couple.push({
                     A: {
-                        username: socket.username,
+                        user: socket.user,
                         status: false
                     },
                     B: {
-                        username: matchedUser.username,
+                        user: matchedUser,
                         status: false
                     }
                 });
 
-                io.to([socket.username, matchedUser.username]).emit('wait', {
+                io.to([socket.username]).emit('wait', {
                     A: socket.user,
                     B: matchedUser
                 });
             } else {
                 console.log('fail');
-                io.to(socket.username).emit('fail', {                    
+                io.to(socket.username).emit('fail', {
                     message: "We haven't found out anyone matching with you!"
                 });
             }
@@ -78,13 +96,13 @@ const socket = (server) => {
         socket.on('ok', (data) => {
             couple.forEach((cp) => {
                 if (cp.A.status && cp.B.status) {
-                    io.to([socket.username, matchedUser.username]).emit('match', {
+                    io.to([cp.A.user.username, cp.B.user.username]).emit('match', {
                         message: "Sucessfull"
                     });
                 } else {
-                    if (cp.A === socket.user) {
+                    if (cp.A.user.username === socket.username) {
                         cp.A.status = true;
-                    } else if (cp.B === socket.user) {
+                    } else if (cp.B.username === socket.username) {
                         cp.B.status = true;
                     }
                 }
@@ -95,25 +113,29 @@ const socket = (server) => {
         socket.on('refuse', (data) => {
             let count = 0;
             couple.forEach((cp) => {
-                if (cp.A === socket.user || cp.B === socket.user) {
+                if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
                     couple.splice(count, 1);
+                    
+                    io.to([cp.A.user.username, cp.B.user.username]).emit('fail', {
+                        message: "Fail to match!"
+                    });
 
                     freeUser.add(cp.A.username);
                     freeUser.add(cp.B.username);
                 }
                 count++;
             });
-            io.to([socket.username, matchedUser.username]).emit('fail', {
-                message: "Fail to match!"
-            });
-
         })
 
         socket.on('leave', (data) => {
             let count = 0;
             couple.forEach((cp) => {
-                if (cp.A === socket.user || cp.B === socket.user) {
+                if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
                     couple.splice(count, 1);
+                    
+                    io.to([cp.A.user.username, cp.B.user.username]).emit('end', {
+                        message: "The chat is ended!"
+                    });
 
                     freeUser.add(cp.A.username);
                     freeUser.add(cp.B.username);
@@ -147,7 +169,9 @@ const socket = (server) => {
             await message.save();
 
             io.to([receiver, socket.username]).emit('new', {
-                id, updateTime: message.updateTime
+                id,
+                content,
+                updateTime: message.updateTime
             });
         });
 
@@ -167,11 +191,11 @@ const socket = (server) => {
 
             let count = 0;
             couple.forEach((cp) => {
-                if (cp.A === socket.user) { 
-                    freeUser.add(cp.B.username);
+                if (cp.A.user.username === socket.username) {
+                    freeUser.add(cp.B.user.username);
                     couple.splice(count, 1);
-                } else if (cp.B === socket.user) {
-                    freeUser.add(cp.A.username);
+                } else if (cp.B.user.username === socket.username) {
+                    freeUser.add(cp.A.user.username);
                     couple.splice(count, 1);
                 }
                 count++;

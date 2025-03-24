@@ -76,7 +76,7 @@ const socket = (server) => {
                         status: false
                     },
                     B: {
-                        username: matchedUser,
+                        user: matchedUser,
                         status: false
                     }
                 });

@@ -93,39 +93,39 @@ const socket = (server) => {
             }
         });
 
-        socket.on('ok', (data) => {
-            couple.forEach((cp) => {
-                if (cp.A.status && cp.B.status) {
-                    io.to([cp.A.user.username, cp.B.user.username]).emit('match', {
-                        message: "Sucessfull"
-                    });
-                } else {
-                    if (cp.A.user.username === socket.username) {
-                        cp.A.status = true;
-                    } else if (cp.B.username === socket.username) {
-                        cp.B.status = true;
-                    }
-                }
+        // socket.on('ok', (data) => {
+        //     couple.forEach((cp) => {
+        //         if (cp.A.status && cp.B.status) {
+        //             io.to([cp.A.user.username, cp.B.user.username]).emit('match', {
+        //                 message: "Sucessfull"
+        //             });
+        //         } else {
+        //             if (cp.A.user.username === socket.username) {
+        //                 cp.A.status = true;
+        //             } else if (cp.B.username === socket.username) {
+        //                 cp.B.status = true;
+        //             }
+        //         }
 
-            });
-        });
+        //     });
+        // });
 
-        socket.on('refuse', (data) => {
-            let count = 0;
-            couple.forEach((cp) => {
-                if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
-                    couple.splice(count, 1);
+        // socket.on('refuse', (data) => {
+        //     let count = 0;
+        //     couple.forEach((cp) => {
+        //         if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
+        //             couple.splice(count, 1);
                     
-                    io.to([cp.A.user.username, cp.B.user.username]).emit('fail', {
-                        message: "Fail to match!"
-                    });
+        //             io.to([cp.A.user.username, cp.B.user.username]).emit('fail', {
+        //                 message: "Fail to match!"
+        //             });
 
-                    freeUser.add(cp.A.username);
-                    freeUser.add(cp.B.username);
-                }
-                count++;
-            });
-        })
+        //             freeUser.add(cp.A.username);
+        //             freeUser.add(cp.B.username);
+        //         }
+        //         count++;
+        //     });
+        // })
 
         socket.on('leave', (data) => {
             let count = 0;
@@ -134,7 +134,7 @@ const socket = (server) => {
                     couple.splice(count, 1);
                     
                     io.to([cp.A.user.username, cp.B.user.username]).emit('end', {
-                        message: "The chat is ended!"
+                        message: "The chat is ended by" + socket.username + "!"
                     });
 
                     freeUser.add(cp.A.username);

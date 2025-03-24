@@ -42,22 +42,22 @@ const socket = (server) => {
 
         socket.on('find', async (data) => {
             let matchedUser = null;
-            couple.forEach(async (couple) => {
-                if (couple.A.user.username === socket.username) {
-                    io.to([socket.username]).emit('wait', {
-                        A: socket.user,
-                        B: couple.B.user
-                    });
-                    return;
-                } else if (couple.B.user.username === socket.username) {
-                    io.to([socket.username]).emit('wait', {
-                        A: socket.user,
-                        B: couple.A.user
-                    });
-                    return;
-                }
+            // couple.forEach(async (couple) => {
+            //     if (couple.A.user.username === socket.username) {
+            //         io.to([socket.username]).emit('wait', {
+            //             A: socket.user,
+            //             B: couple.B.user
+            //         });
+            //         return;
+            //     } else if (couple.B.user.username === socket.username) {
+            //         io.to([socket.username]).emit('wait', {
+            //             A: socket.user,
+            //             B: couple.A.user
+            //         });
+            //         return;
+            //     }
 
-            });
+            // });
 
             freeUser.add(socket.username);
 
@@ -81,7 +81,7 @@ const socket = (server) => {
                     }
                 });
 
-                io.to([socket.username]).emit('wait', {
+                io.to([socket.username, matchedUser.username]).emit('wait', {
                     A: socket.user,
                     B: matchedUser
                 });

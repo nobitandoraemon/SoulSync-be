@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
-const { opts, userTempStorage} = require('../utils/tempStorage');
+const { opts } = require('../utils/tempStorage');
 
 // Tạo transporter để gửi email
 const transporter = nodemailer.createTransport({
@@ -51,20 +51,26 @@ const verifyOtp = async (req, res) => {
         return res.status(400).json({ message: 'OTP không chính xác.' });
     }
 
-    const tempUser = userTempStorage.get(username);
-    console.log('tempUser:', tempUser);
-    if (!tempUser) {
+    const user = await User.findOne({ username });
+    // const tempUser = userTempStorage.get(username);
+    // console.log('tempUser:', tempUser);
+
+    if (!user) {
         return res.status(400).json({ message: 'Thông tin người dùng không tồn tại hoặc đã hết hạn.' });
     }
 
-    const newUser = new User(tempUser);
-    console.log('newUser:', newUser);
-    await newUser.save();
+    user.isVerified = true;
+    await user.save();
 
     opts.delete(username);
-    userTempStorage.delete(username);
 
-    res.status(200).json({ message: 'Đăng ký thành công.' });
+    res.status(200).json({ message: 'Xác nhận gmail thành công.' });
 };
 
-module.exports = { sendOtpByEmail, verifyOtp };
+const refreshOtp = async (req, res) => {
+    const { username } = req.body;
+    await sendOtpByEmail(username);
+    res.status(200).json({ message: 'Check mail để lấy mã OTP!' });
+}
+
+module.exports = { sendOtpByEmail, verifyOtp, refreshOtp };

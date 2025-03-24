@@ -19,7 +19,7 @@ const socket = (server) => {
     io.use(async (socket, next) => {
         const username = socket.handshake.auth.username;
         if (!username) {
-            return next(new Error('Invalid username'));
+            return next(new Error('Không thể kết nối! Hãy thử lại nhé!'));
         }
         socket.username = username;
 
@@ -88,7 +88,7 @@ const socket = (server) => {
             } else {
                 console.log('fail');
                 io.to(socket.username).emit('fail', {
-                    message: "We haven't found out anyone matching with you!"
+                    message: "Chúng tôi không tìm thấy ai phù hợp với bạn!"
                 });
             }
         });
@@ -134,7 +134,7 @@ const socket = (server) => {
                     couple.splice(count, 1);
                     
                     io.to([cp.A.user.username, cp.B.user.username]).emit('end', {
-                        message: "The chat is ended by" + socket.username + "!"
+                        message: "Cuộc trò chuyện đã kết thúc từ phía " + socket.username + "!"
                     });
 
                     freeUser.add(cp.A.username);

@@ -8,10 +8,11 @@ const userSchema = new mongoose.Schema({
   zodiac: { type: Number },
   hobbies: { type: [String] },
   location: { type: String },
-  fullName: {type: String},
-  phoneNumber: {type: String},
-  quote: {type: String},
-  image: { type: String }
+  fullName: { type: String },
+  phoneNumber: { type: String },
+  quote: { type: String },
+  image: { type: String },
+  isVerified: { type: Boolean, default: false }
 });
 
 module.exports = mongoose.model("User", userSchema);

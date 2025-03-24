@@ -4,6 +4,6 @@ const { verifyOtp, refreshOtp } = require('../controllers/otpController');
 
 
 router.post('/verify-otp', verifyOtp);
-router.get('/verify-otp', refreshOtp);
+router.post('/refresh', refreshOtp);
 
 module.exports = router;

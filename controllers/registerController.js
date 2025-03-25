@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const { sendOtpByEmail } = require('./otpController');
-const { userTempStorage } = require('../utils/tempStorage');
 
 const isValidEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,7 +33,10 @@ const registerUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         
-        userTempStorage.set(username, { username, password: hashedPassword });
+        await User.create({
+            username: username,
+            password: hashedPassword
+        })
         await sendOtpByEmail(username);
 
         res.status(200).json({ message: 'Vui lòng kiểm tra email để nhận mã OTP.' });

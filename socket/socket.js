@@ -19,7 +19,7 @@ const socket = (server) => {
     io.use(async (socket, next) => {
         const username = socket.handshake.auth.username;
         if (!username) {
-            return next(new Error('Invalid username'));
+            return next(new Error('Không thể kết nối! Hãy thử lại nhé!'));
         }
         socket.username = username;
 
@@ -42,22 +42,22 @@ const socket = (server) => {
 
         socket.on('find', async (data) => {
             let matchedUser = null;
-            couple.forEach(async (couple) => {
-                if (couple.A.user.username === socket.username) {
-                    io.to([socket.username]).emit('wait', {
-                        A: socket.user,
-                        B: couple.B.user
-                    });
-                    return;
-                } else if (couple.B.user.username === socket.username) {
-                    io.to([socket.username]).emit('wait', {
-                        A: socket.user,
-                        B: couple.A.user
-                    });
-                    return;
-                }
+            // couple.forEach(async (couple) => {
+            //     if (couple.A.user.username === socket.username) {
+            //         io.to([socket.username]).emit('wait', {
+            //             A: socket.user,
+            //             B: couple.B.user
+            //         });
+            //         return;
+            //     } else if (couple.B.user.username === socket.username) {
+            //         io.to([socket.username]).emit('wait', {
+            //             A: socket.user,
+            //             B: couple.A.user
+            //         });
+            //         return;
+            //     }
 
-            });
+            // });
 
             freeUser.add(socket.username);
 
@@ -81,51 +81,51 @@ const socket = (server) => {
                     }
                 });
 
-                io.to([socket.username]).emit('wait', {
+                io.to([socket.username, matchedUser.username]).emit('wait', {
                     A: socket.user,
                     B: matchedUser
                 });
             } else {
                 console.log('fail');
                 io.to(socket.username).emit('fail', {
-                    message: "We haven't found out anyone matching with you!"
+                    message: "Chúng tôi không tìm thấy ai phù hợp với bạn!"
                 });
             }
         });
 
-        socket.on('ok', (data) => {
-            couple.forEach((cp) => {
-                if (cp.A.status && cp.B.status) {
-                    io.to([cp.A.user.username, cp.B.user.username]).emit('match', {
-                        message: "Sucessfull"
-                    });
-                } else {
-                    if (cp.A.user.username === socket.username) {
-                        cp.A.status = true;
-                    } else if (cp.B.username === socket.username) {
-                        cp.B.status = true;
-                    }
-                }
+        // socket.on('ok', (data) => {
+        //     couple.forEach((cp) => {
+        //         if (cp.A.status && cp.B.status) {
+        //             io.to([cp.A.user.username, cp.B.user.username]).emit('match', {
+        //                 message: "Sucessfull"
+        //             });
+        //         } else {
+        //             if (cp.A.user.username === socket.username) {
+        //                 cp.A.status = true;
+        //             } else if (cp.B.username === socket.username) {
+        //                 cp.B.status = true;
+        //             }
+        //         }
 
-            });
-        });
+        //     });
+        // });
 
-        socket.on('refuse', (data) => {
-            let count = 0;
-            couple.forEach((cp) => {
-                if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
-                    couple.splice(count, 1);
+        // socket.on('refuse', (data) => {
+        //     let count = 0;
+        //     couple.forEach((cp) => {
+        //         if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
+        //             couple.splice(count, 1);
                     
-                    io.to([cp.A.user.username, cp.B.user.username]).emit('fail', {
-                        message: "Fail to match!"
-                    });
+        //             io.to([cp.A.user.username, cp.B.user.username]).emit('fail', {
+        //                 message: "Fail to match!"
+        //             });
 
-                    freeUser.add(cp.A.username);
-                    freeUser.add(cp.B.username);
-                }
-                count++;
-            });
-        })
+        //             freeUser.add(cp.A.username);
+        //             freeUser.add(cp.B.username);
+        //         }
+        //         count++;
+        //     });
+        // })
 
         socket.on('leave', (data) => {
             let count = 0;
@@ -134,7 +134,7 @@ const socket = (server) => {
                     couple.splice(count, 1);
                     
                     io.to([cp.A.user.username, cp.B.user.username]).emit('end', {
-                        message: "The chat is ended!"
+                        message: "Cuộc trò chuyện đã kết thúc từ phía " + socket.username + "!"
                     });
 
                     freeUser.add(cp.A.username);

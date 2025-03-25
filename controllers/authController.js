@@ -1,10 +1,11 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { sendOtpByEmail } = require("../controllers/otpController");
 
 // LOGIN
 const loginUser = async (req, res) => {
-    const { username, password } = req.body; 
+    const { username, password } = req.body;
     if (!username || !password) {
         return res.status(400).json({ message: "Tên và mật khẩu là bắt buộc." });
     }
@@ -18,6 +19,11 @@ const loginUser = async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
             return res.status(401).json({ message: 'Thông tin đăng nhập không hợp lệ.' });
+        }
+
+        if (!user.isVerified) {
+            await sendOtpByEmail(user.username);
+            return res.status(401).json({ message: 'Bạn chưa xác nhận gmail! Check mail để lấy mã OTP!' });
         }
 
         const accessToken = jwt.sign(
@@ -36,7 +42,7 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'None',
-            maxAge: 24 * 60 * 60 * 1000 
+            maxAge: 24 * 60 * 60 * 1000
         });
 
         res.json({ accessToken });
@@ -51,12 +57,12 @@ const logoutUser = async (req, res) => {
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.sendStatus(204);
 
-    res.clearCookie('jwt', { 
-        httpOnly: true, 
-        sameSite: 'None', 
-        secure: process.env.NODE_ENV === 'production' 
+    res.clearCookie('jwt', {
+        httpOnly: true,
+        sameSite: 'None',
+        secure: process.env.NODE_ENV === 'production'
     });
-    
+
     return res.json({ message: 'Đăng xuất thành công' });
 };
 

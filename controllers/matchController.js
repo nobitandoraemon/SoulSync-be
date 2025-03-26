@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const calculateZodiacScore = require('../data/zodiacMatch');
 const calculateNumerologyScore = require('../data/numerologyMatch');
+const calculateLocationScore = require('../data/locationMatch');
+const calculateHobbyScore = require('../data/hobbiesMatch');
 const freeUser = require('../data/freeUser');
 
 const searchMatch = async (username) => {
@@ -18,8 +20,10 @@ const searchMatch = async (username) => {
         //Tính điểm
         const zodiacScore = calculateZodiacScore(user.zodiac, otherUser.zodiac);
         const numerologyScore = calculateNumerologyScore(user.birthday, otherUser.birthday);
+        const locationScore = calculateLocationScore(user.location, otherUser.location);
+        const hobbyScore = calculateHobbyScore(user.hobbies, otherUser.hobbies);
 
-        const score = zodiacScore * 2 + numerologyScore;
+        const score = zodiacScore + numerologyScore + locationScore + hobbyScore;
 
         if (score > bestScore) {
             bestScore = score;

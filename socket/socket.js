@@ -37,7 +37,7 @@ const socket = (server) => {
 
         socket.join(socket.username);
         freeUser.add(socket.username);
-        console.log(freeUser);
+        console.log("connect ", freeUser);
 
 
         socket.on('find', async (data) => {
@@ -122,6 +122,8 @@ const socket = (server) => {
 
                     freeUser.add(cp.A.username);
                     freeUser.add(cp.B.username);
+                    console.log("refuse ", freeUser);
+                    
                 }
                 count++;
             });
@@ -139,6 +141,8 @@ const socket = (server) => {
 
                     freeUser.add(cp.A.username);
                     freeUser.add(cp.B.username);
+                    console.log("leave ",freeUser);
+                    
                 }
                 count++;
             });
@@ -201,6 +205,8 @@ const socket = (server) => {
                 count++;
             });
             console.log(`${socket.username} diconnected!`);
+            console.log("dis ", freeUser);
+            
         });
 
     });

@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   hobbies: { type: [String] },
   location: { type: String },
   fullName: { type: String },
+  nickName: { type: String },
   phoneNumber: { type: String },
   quote: { type: String },
   image: { type: String },

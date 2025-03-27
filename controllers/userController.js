@@ -28,8 +28,8 @@ const getUserByUsername = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { username } = req.params;
-        const { birthday, gender, zodiac, hobbies, location, fullName, phoneNumber, quote, image  } = req.body;
-        const updateData = { birthday, gender, zodiac, hobbies, location, fullName, phoneNumber, quote, image  };
+        const { birthday, gender, zodiac, hobbies, location, fullName, phoneNumber, quote, image, nickName  } = req.body;
+        const updateData = { birthday, gender, zodiac, hobbies, location, fullName, nickName, phoneNumber, quote, image };
 
         const updatedUser = await User.findOneAndUpdate(
             { username },

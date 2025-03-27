@@ -73,11 +73,13 @@ const socket = (server) => {
                 couple.push({
                     A: {
                         user: socket.user,
-                        status: false
+                        status: false,
+                        liked: false
                     },
                     B: {
                         user: matchedUser,
-                        status: false
+                        status: false,
+                        liked: false
                     }
                 });
 
@@ -110,18 +112,44 @@ const socket = (server) => {
         //     });
         // });
 
+        socket.on('like', (data) => {
+            couple.forEach((cp) => {
+                if (cp.A.user.username === socket.username) {
+                    cp.A.liked = true;
+                    
+                    if(cp.B.liked === true) {
+                        console.log("love");
+                        
+                        io.to([cp.A.user.username, cp.B.user.username]).emit('love', {
+                            message: "Bạn có thể xem hồ sơ của đối phương!"
+                        });
+                    }
+                } else if (cp.B.user.username === socket.username) {
+                    cp.B.liked = true;
+
+                    if(cp.A.liked === true) {
+                        console.log("love");
+                        
+                        io.to([cp.A.user.username, cp.B.user.username]).emit('love', {
+                            message: "Bạn có thể xem hồ sơ của đối phương!"
+                        });
+                    }
+                }
+            });
+        })
+
         socket.on('refuse', (data) => {
             let count = 0;
             couple.forEach((cp) => {
                 if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
+                    freeUser.add(cp.A.username);
+                    freeUser.add(cp.B.username);
                     couple.splice(count, 1);
                     
                     io.to([cp.A.user.username, cp.B.user.username]).emit('fail', {
-                        message: "Fail to match!"
+                        message: "Ghép đôi thất bại!"
                     });
 
-                    freeUser.add(cp.A.username);
-                    freeUser.add(cp.B.username);
                     console.log("refuse ", freeUser);
                     
                 }
@@ -133,14 +161,14 @@ const socket = (server) => {
             let count = 0;
             couple.forEach((cp) => {
                 if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
+
+                    freeUser.add(cp.A.username);
+                    freeUser.add(cp.B.username);
                     couple.splice(count, 1);
                     
                     io.to([cp.A.user.username, cp.B.user.username]).emit('end', {
                         message: "Cuộc trò chuyện đã kết thúc từ phía " + socket.username + "!"
                     });
-
-                    freeUser.add(cp.A.username);
-                    freeUser.add(cp.B.username);
                     console.log("leave ",freeUser);
                     
                 }
@@ -155,8 +183,6 @@ const socket = (server) => {
                 receiver, content,
                 createTime: new Date()
             });
-
-            console.log(result);
 
             io.to([receiver, socket.username]).emit('message', {
                 sender: socket.username,

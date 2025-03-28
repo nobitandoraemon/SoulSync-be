@@ -44,8 +44,8 @@ const calculateNumerologyScore = (date1, date2) => {
     const num1 = calculateNumerology(date1);
     const num2 = calculateNumerology(date2);
 
-    if (numerologyScores[num1]?.compatible.includes(num2)) return 3;
-    if (numerologyScores[num1]?.lessCompatible.includes(num2)) return -2;
+    if (numerologyScores[num1]?.compatible.includes(num2)) return 5;
+    if (numerologyScores[num1]?.lessCompatible.includes(num2)) return -3;
     return 1; // Trung lập
 };
 

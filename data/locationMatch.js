@@ -86,15 +86,15 @@ const calculateLocationScore = (user1Province, user2Province) => {
     const distance = haversine(lat1, lon1, lat2, lon2);
 
     if (distance <= 50) return 10;
-    if (distance <= 100) return 9;
-    if (distance <= 200) return 8;
-    if (distance <= 400) return 7;
-    if (distance <= 600) return 6;
-    if (distance <= 800) return 5;
-    if (distance <= 1000) return 4;
-    if (distance <= 1200) return 3;
-    if (distance <= 1500) return 2;
-    return 1;
+    if (distance <= 100) return 8;
+    if (distance <= 200) return 6;
+    if (distance <= 400) return 4;
+    if (distance <= 600) return 2;
+    if (distance <= 800) return 1;
+    if (distance <= 1000) return 0;
+    if (distance <= 1200) return -1;
+    if (distance <= 1500) return -2;
+    return -3;
 };
 
 module.exports = calculateLocationScore;

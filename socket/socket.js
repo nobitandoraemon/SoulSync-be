@@ -226,6 +226,12 @@ const socket = (server) => {
             couple.forEach((cp) => {
                 if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
                     couple.splice(count, 1);
+
+                    io.to([cp.A.user.username, cp.B.user.username]).emit('end', {
+                        message: "Cuộc trò chuyện đã kết thúc từ phía " + socket.username + "!"
+                    });
+                    console.log("leave ",freeUser);
+                    console.log(couple);
                 }
                 count++;
             });

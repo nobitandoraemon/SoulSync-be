@@ -126,8 +126,9 @@ const socket = (server) => {
             let count = 0;
             couple.forEach((cp) => {
                 if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
-                    freeUser.add(cp.A.username);
-                    freeUser.add(cp.B.username);
+                    
+                    freeUser.add(cp.A.user.username);
+                    freeUser.add(cp.B.user.username);
                     couple.splice(count, 1);
                     
                     io.to([cp.A.user.username, cp.B.user.username]).emit('fail', {

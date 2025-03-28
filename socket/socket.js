@@ -82,7 +82,8 @@ const socket = (server) => {
                         liked: false
                     }
                 });
-
+                console.log("match", couple);
+                
                 io.to([socket.username, matchedUser.username]).emit('wait', {
                     A: socket.user,
                     B: matchedUser
@@ -149,8 +150,9 @@ const socket = (server) => {
                     io.to([cp.A.user.username, cp.B.user.username]).emit('fail', {
                         message: "Ghép đôi thất bại!"
                     });
-
+                    
                     console.log("refuse ", freeUser);
+                    console.log(couple);
                     
                 }
                 count++;
@@ -162,14 +164,15 @@ const socket = (server) => {
             couple.forEach((cp) => {
                 if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
 
-                    freeUser.add(cp.A.username);
-                    freeUser.add(cp.B.username);
+                    // freeUser.add(cp.A.username);
+                    // freeUser.add(cp.B.username);
                     couple.splice(count, 1);
                     
                     io.to([cp.A.user.username, cp.B.user.username]).emit('end', {
                         message: "Cuộc trò chuyện đã kết thúc từ phía " + socket.username + "!"
                     });
                     console.log("leave ",freeUser);
+                    console.log(couple);
                     
                 }
                 count++;
@@ -191,28 +194,28 @@ const socket = (server) => {
             });
         });
 
-        socket.on('update', async (data) => {
-            const { id, content } = data;
-            const message = await Message.find({ "_id": id });
-            message.content = content;
-            message.updateTime = new Date();
-            await message.save();
+        // socket.on('update', async (data) => {
+        //     const { id, content } = data;
+        //     const message = await Message.find({ "_id": id });
+        //     message.content = content;
+        //     message.updateTime = new Date();
+        //     await message.save();
 
-            io.to([receiver, socket.username]).emit('new', {
-                id,
-                content,
-                updateTime: message.updateTime
-            });
-        });
+        //     io.to([receiver, socket.username]).emit('new', {
+        //         id,
+        //         content,
+        //         updateTime: message.updateTime
+        //     });
+        // });
 
-        socket.on('delete', async (data) => {
-            const { id } = data;
-            const message = await Message.findByIdAndDelete({ "_id": id });
+        // socket.on('delete', async (data) => {
+        //     const { id } = data;
+        //     const message = await Message.findByIdAndDelete({ "_id": id });
 
-            io.to([receiver, socket.username]).emit('delete', { //emit delete back to A and B
-                id, deleteTime: new Date()
-            });
-        });
+        //     io.to([receiver, socket.username]).emit('delete', { //emit delete back to A and B
+        //         id, deleteTime: new Date()
+        //     });
+        // });
 
         socket.on('disconnect', () => {
             if (freeUser.has(socket.username)) {
@@ -221,16 +224,14 @@ const socket = (server) => {
 
             let count = 0;
             couple.forEach((cp) => {
-                if (cp.A.user.username === socket.username) {
-                    freeUser.add(cp.B.user.username);
-                    couple.splice(count, 1);
-                } else if (cp.B.user.username === socket.username) {
-                    freeUser.add(cp.A.user.username);
+                if (cp.A.user.username === socket.username || cp.B.user.username === socket.username) {
                     couple.splice(count, 1);
                 }
                 count++;
             });
             console.log(`${socket.username} diconnected!`);
+            console.log("dis", couple);
+            
             console.log("dis ", freeUser);
             
         });

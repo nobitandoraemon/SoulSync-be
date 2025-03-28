@@ -73,15 +73,15 @@ const socket = (server) => {
                 couple.push({
                     A: {
                         user: socket.user,
-                        status: false,
                         liked: false
                     },
                     B: {
                         user: matchedUser,
-                        status: false,
                         liked: false
                     }
                 });
+                console.log(couple[0].A);
+                
                 console.log("match", couple);
                 
                 io.to([socket.username, matchedUser.username]).emit('wait', {
@@ -95,23 +95,6 @@ const socket = (server) => {
                 });
             }
         });
-
-        // socket.on('ok', (data) => {
-        //     couple.forEach((cp) => {
-        //         if (cp.A.status && cp.B.status) {
-        //             io.to([cp.A.user.username, cp.B.user.username]).emit('match', {
-        //                 message: "Sucessfull"
-        //             });
-        //         } else {
-        //             if (cp.A.user.username === socket.username) {
-        //                 cp.A.status = true;
-        //             } else if (cp.B.username === socket.username) {
-        //                 cp.B.status = true;
-        //             }
-        //         }
-
-        //     });
-        // });
 
         socket.on('like', (data) => {
             couple.forEach((cp) => {

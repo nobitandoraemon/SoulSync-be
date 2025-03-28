@@ -107,6 +107,10 @@ const socket = (server) => {
                         io.to([cp.A.user.username, cp.B.user.username]).emit('love', {
                             message: "Bạn có thể xem hồ sơ của đối phương!"
                         });
+                    } else {
+                        io.to([cp.B.user.username]).emit('liked', {
+                            message: "Đối phương đã bấm like!"
+                        });
                     }
                 } else if (cp.B.user.username === socket.username) {
                     cp.B.liked = true;
@@ -116,6 +120,10 @@ const socket = (server) => {
                         
                         io.to([cp.A.user.username, cp.B.user.username]).emit('love', {
                             message: "Bạn có thể xem hồ sơ của đối phương!"
+                        });
+                    } else {
+                        io.to([cp.A.user.username]).emit('liked', {
+                            message: "Đối phương đã bấm like!"
                         });
                     }
                 }

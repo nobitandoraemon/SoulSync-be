@@ -80,9 +80,9 @@ const socket = (server) => {
                         liked: false
                     }
                 });
-                console.log(couple[0].A);
                 
-                console.log("match", couple);
+                console.log("match", couple.forEach((cp) => console.log(cp.A," - ", cp.B, ", ")
+                ));
                 
                 io.to([socket.username, matchedUser.username]).emit('wait', {
                     A: socket.user,

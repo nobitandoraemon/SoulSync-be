@@ -26,8 +26,8 @@ const socket = (server) => {
         const user = await User.findOne({ username }).select('-password');
 
         socket.user = user;
-        // console.log(socket.user);
-        // console.log(socket.username);        
+        console.log(socket.user);
+        console.log(socket.username);        
 
         next();
     });

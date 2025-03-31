@@ -4,6 +4,10 @@ const Message = require('../models/Message');
 const messageController = {
     //GET ALL MESSAGES IN A ROOM  /messages/?sender=<senderName>&receiver=<receiverName>
     getMessages: async (req, res) => {
+        if(req.user !== req.query.sender && req.user !== req.query.receiver) {
+            return res.sendStatus(401);
+        }
+
         try {
             const { sender, receiver } = req.query;
 
@@ -29,10 +33,14 @@ const messageController = {
         try {
             const { id: messageId } = req.params;
 
-            const message = await Message.findByIdAndDelete(messageId);
+            const message = await Message.findOne({'_id': messageId});
             if (!message) {
                 return res.status(404).json('Message not found');
             }
+            if(req.user !== message.sender) {
+                return res.sendStatus(401);
+            }
+            await Message.deleteOne({'_id': messageId});
             res.status(200).json('Message deleted successfully');
         } catch (error) {
             res.status(500).json({message: error.message});
@@ -44,18 +52,21 @@ const messageController = {
         try {
             const { id: messageId } = req.params;
 
-            const message = await Message.findByIdAndUpdate(
-                messageId, 
-                { ...req.body, updateTime: Date.now() },
-                { new: true }
-            );
+            const message = await Message.findOne({'_id': messageId});
             
             if (!message) {
                 return res.status(404).json({message: "Message not found", id: messageId});
             }
+            if(req.user !== message.sender) {
+                return res.sendStatus(401);
+            }
 
-            const updated_message = await Message.findById(messageId);
-            res.status(200).json(updated_message);
+            const updatedMessage = await Message.findByIdAndUpdate(
+                messageId, 
+                { ...req.body, updateTime: Date.now() },
+                { new: true }
+            );
+            res.status(200).json(updatedMessage);
         } catch (error) {
             res.status(500).json({message: error.message});
         }

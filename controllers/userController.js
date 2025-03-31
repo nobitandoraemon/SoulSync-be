@@ -11,7 +11,10 @@ const getAllUsers = async (req, res) => {
 };
 
 // Lấy thông tin một người dùng theo username
-const getUserByUsername = async (req, res) => {
+const getUserByUsername = async (req, res) => {    
+    if(req.user !== req.params.username) {
+        return res.sendStatus(401);
+    }
     try {
         const user = await User.findOne({ username: req.params.username }).select('-password');
         if (!user) {
@@ -26,6 +29,9 @@ const getUserByUsername = async (req, res) => {
 // Cập nhật thông tin người dùng
 
 const updateUser = async (req, res) => {
+    if(req.user !== req.params.username) {
+        return res.sendStatus(401);
+    }
     try {
         const { username } = req.params;
         const { birthday, gender, zodiac, hobbies, location, fullName, phoneNumber, quote, image, nickName  } = req.body;
@@ -49,6 +55,9 @@ const updateUser = async (req, res) => {
 
 // Xóa người dùng
 const deleteUser = async (req, res) => {
+    if(req.user !== req.params.username) {
+        return res.sendStatus(401);
+    }
     try {
         const deletedUser = await User.findOneAndDelete({ username: req.params.username });
         if (!deletedUser) {
